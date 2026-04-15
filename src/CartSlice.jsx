@@ -6,36 +6,61 @@ export const CartSlice = createSlice({
     items: [], // Initialize items as an empty array
   },
   reducers: {
-    // 1. addItem logic from your instruction
+
+    // ✅ ADD ITEM
     addItem: (state, action) => {
-      const { name, image, cost } = action.payload; 
-      const existingItem = state.items.find(item => item.name === name);
+      const { name, image, cost } = action.payload;
+
+      const existingItem = state.items.find(
+        (item) => item.name === name
+      );
+
       if (existingItem) {
-        existingItem.quantity++;
+        // kung existing na → dagdag quantity
+        existingItem.quantity += 1;
       } else {
-        state.items.push({ name, image, cost, quantity: 1 });
+        // kung bago → add sa cart
+        state.items.push({
+          name,
+          image,
+          cost,
+          quantity: 1,
+        });
       }
     },
 
-    // 2. removeItem logic from your instruction
+    // ✅ REMOVE ITEM
     removeItem: (state, action) => {
-      // action.payload should be the name of the item to remove
-      state.items = state.items.filter(item => item.name !== action.payload);
+      const name = action.payload;
+
+      state.items = state.items.filter(
+        (item) => item.name !== name
+      );
     },
 
-    // 3. updateQuantity logic from your instruction
+    // ✅ UPDATE QUANTITY
     updateQuantity: (state, action) => {
       const { name, quantity } = action.payload;
-      const itemToUpdate = state.items.find(item => item.name === name);
-      if (itemToUpdate) {
-        itemToUpdate.quantity = quantity; 
+
+      const item = state.items.find(
+        (item) => item.name === name
+      );
+
+      if (item) {
+        if (quantity <= 0) {
+          // auto remove pag zero
+          state.items = state.items.filter(
+            (i) => i.name !== name
+          );
+        } else {
+          item.quantity = quantity;
+        }
       }
     },
+
   },
 });
 
-// Handle Actions: Export the action creators
 export const { addItem, removeItem, updateQuantity } = CartSlice.actions;
 
-// Export the reducer as the default to use in store.js
 export default CartSlice.reducer;
